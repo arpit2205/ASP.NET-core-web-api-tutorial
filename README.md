@@ -163,3 +163,24 @@ namespace PokemonReviewApp.Models
 }
 
 ```
+
+### 2. Database Connection
+1. Install Microsoft SQL Server Management Studio
+2. Right-click on databases -> Create new database
+3. Open SQL Server Object Explorer in VS
+4. Click on add SQL Server
+5. Go back to SSMS, right-click on "DESKTOP..." -> Select properties -> Copy name
+6. Enter this name as server name in VS
+7. Select the created DB from the dropdown
+8. From the server explorer, click on the new DB -> right click -> properties
+9. Copy connection string from here
+10. Enter the connection string in appsettings.json like this        
+```
+    "ConnectionStrings": {
+    "DefaultConnection": "Data Source=DESKTOP-D4KDER9\\SQLEXPRESS;Initial Catalog=pokemonreview;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False"
+  },
+```
+
+### 3. Install Entity Framework
+1. Go to manage NuGet packages
+2. Install Microsoft.EntityFrameworkCore.SqlServer and Microsoft.EntityFrameworkCore.Design
