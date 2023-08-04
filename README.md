@@ -41,8 +41,9 @@ namespace PokemonReviewApp.Models
 
 ➡️ **Relationships**
 
-_Refer to this image for relations_    
-![UMLDiagram](https://github.com/arpit2205/ASP.NET-core-web-api-tutorial/assets/51786177/2f958f1f-9608-4ee1-86f3-325917ae63ce)
+_Refer to this image for relations_
+![UMLDiagram](https://github.com/arpit2205/ASP.NET-core-web-api-tutorial/assets/51786177/7daa5312-7b6b-4a81-9564-811b5c3c9e93)
+
 
 1. **One to Many [One side]**
 ```
