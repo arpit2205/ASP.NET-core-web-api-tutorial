@@ -41,7 +41,7 @@ namespace PokemonReviewApp.Models
 
 ➡️ **Relationships**
 
-_Refer to this image for relations_
+_Refer to this image for relations_      
 ![UMLDiagram](https://github.com/arpit2205/ASP.NET-core-web-api-tutorial/assets/51786177/7daa5312-7b6b-4a81-9564-811b5c3c9e93)
 
 
