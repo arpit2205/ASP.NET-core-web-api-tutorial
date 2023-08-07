@@ -339,18 +339,18 @@ namespace PokemonReviewApp
                             },
                             Reviews = new List<Review>()
                             {
-                                new Review { Title="Pikachu",Text = "Pickahu is the best pokemon, because it is electric", Rating = 5,
+                                new Review { Title="Pikachu",Text = "Pickahu is the best pokemon, because it is electric",
                                 Reviewer = new Reviewer(){ FirstName = "Teddy", LastName = "Smith" } },
-                                new Review { Title="Pikachu", Text = "Pickachu is the best a killing rocks", Rating = 5,
+                                new Review { Title="Pikachu", Text = "Pickachu is the best a killing rocks",
                                 Reviewer = new Reviewer(){ FirstName = "Taylor", LastName = "Jones" } },
-                                new Review { Title="Pikachu",Text = "Pickchu, pickachu, pikachu", Rating = 1,
+                                new Review { Title="Pikachu",Text = "Pickchu, pickachu, pikachu",
                                 Reviewer = new Reviewer(){ FirstName = "Jessica", LastName = "McGregor" } },
                             }
                         },
                         Owner = new Owner()
                         {
-                            FirstName = "Jack",
-                            LastName = "London",
+                            Name = "Jack London",
+
                             Gym = "Brocks Gym",
                             Country = new Country()
                             {
@@ -370,18 +370,17 @@ namespace PokemonReviewApp
                             },
                             Reviews = new List<Review>()
                             {
-                                new Review { Title= "Squirtle", Text = "squirtle is the best pokemon, because it is electric", Rating = 5,
+                                new Review { Title= "Squirtle", Text = "squirtle is the best pokemon, because it is electric",
                                 Reviewer = new Reviewer(){ FirstName = "Teddy", LastName = "Smith" } },
-                                new Review { Title= "Squirtle",Text = "Squirtle is the best a killing rocks", Rating = 5,
+                                new Review { Title= "Squirtle",Text = "Squirtle is the best a killing rocks",
                                 Reviewer = new Reviewer(){ FirstName = "Taylor", LastName = "Jones" } },
-                                new Review { Title= "Squirtle", Text = "squirtle, squirtle, squirtle", Rating = 1,
+                                new Review { Title= "Squirtle", Text = "squirtle, squirtle, squirtle",
                                 Reviewer = new Reviewer(){ FirstName = "Jessica", LastName = "McGregor" } },
                             }
                         },
                         Owner = new Owner()
                         {
-                            FirstName = "Harry",
-                            LastName = "Potter",
+                            Name = "Harry Potter",
                             Gym = "Mistys Gym",
                             Country = new Country()
                             {
@@ -401,18 +400,17 @@ namespace PokemonReviewApp
                             },
                             Reviews = new List<Review>()
                             {
-                                new Review { Title="Veasaur",Text = "Venasuar is the best pokemon, because it is electric", Rating = 5,
+                                new Review { Title="Veasaur",Text = "Venasuar is the best pokemon, because it is electric",
                                 Reviewer = new Reviewer(){ FirstName = "Teddy", LastName = "Smith" } },
-                                new Review { Title="Veasaur",Text = "Venasuar is the best a killing rocks", Rating = 5,
+                                new Review { Title="Veasaur",Text = "Venasuar is the best a killing rocks",
                                 Reviewer = new Reviewer(){ FirstName = "Taylor", LastName = "Jones" } },
-                                new Review { Title="Veasaur",Text = "Venasuar, Venasuar, Venasuar", Rating = 1,
+                                new Review { Title="Veasaur",Text = "Venasuar, Venasuar, Venasuar",
                                 Reviewer = new Reviewer(){ FirstName = "Jessica", LastName = "McGregor" } },
                             }
                         },
                         Owner = new Owner()
                         {
-                            FirstName = "Ash",
-                            LastName = "Ketchum",
+                            Name = "Ash Ketchum",
                             Gym = "Ashs Gym",
                             Country = new Country()
                             {
