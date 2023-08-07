@@ -556,3 +556,8 @@ namespace PokemonReviewApp.Controllers
 }
 
 ```
+Then, inject the interface and repository to the program.cs file. 
+```C#
+builder.Services.AddScoped<IPokemonRepository, PokemonRepository>();
+```
+The GET api/Pokemon endpoint is now ready! 🥳
