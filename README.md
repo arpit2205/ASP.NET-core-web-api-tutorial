@@ -521,7 +521,7 @@ Controllers handle incoming HTTP requests and serve as the entry points for your
 
 - Create a new folder Controllers
 - Add a new item PokemonController.cs
-```brainfuck
+```C#
 using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
