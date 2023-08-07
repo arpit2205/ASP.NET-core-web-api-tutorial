@@ -24,7 +24,7 @@
 4. Make multiple .cs files for all the required schemas
 
 _Example: Pokemon.cs_
-```
+```C#
 namespace PokemonReviewApp.Models
 {
     public class Pokemon
@@ -46,7 +46,7 @@ _Refer to this image for relations_
 
 
 1. **One to Many [One side]**
-```
+```C#
 namespace PokemonReviewApp.Models
 {
     public class Owner
@@ -63,7 +63,7 @@ namespace PokemonReviewApp.Models
 
 ```
 2. **One to Many [Many side]**
-```
+```C#
 namespace PokemonReviewApp.Models
 {
     public class Country
@@ -80,9 +80,9 @@ namespace PokemonReviewApp.Models
 3. **Many to Many**  
 For many-to-many, we actually need to create models (schemas) of the joined tables that we want. In this example, we want to create 2 joined tables, one is Pokemon-Categories and other is Pokemon-Owners. Both of these are many-to-many relationships.  
 
-```
+```C#
 // Creating the joined table schema
-1. Pokemon-Owner
+// 1. Pokemon-Owner
 
 namespace PokemonReviewApp.Models
 {
@@ -95,7 +95,7 @@ namespace PokemonReviewApp.Models
     }
 }
 
-2. Pokemon-Category
+// 2. Pokemon-Category
 namespace PokemonReviewApp.Models
 {
     public class PokemonCategory
@@ -110,8 +110,8 @@ namespace PokemonReviewApp.Models
 ```
 Now, we need to add the ICollection<JoinedTableScema> to the individual schemas (pokemon, category, owner) just like we did in one-to-many relations  
 
-```
-1. Pokemon.cs
+```C#
+// 1. Pokemon.cs
 namespace PokemonReviewApp.Models
 {
     public class Pokemon
@@ -131,7 +131,7 @@ namespace PokemonReviewApp.Models
     }
 }
 
-2. Owner.cs
+// 2. Owner.cs
 namespace PokemonReviewApp.Models
 {
     public class Owner
@@ -149,7 +149,7 @@ namespace PokemonReviewApp.Models
     }
 }
 
-3. Category.cs
+// 3. Category.cs
 namespace PokemonReviewApp.Models
 {
     public class Category
@@ -175,7 +175,7 @@ namespace PokemonReviewApp.Models
 8. From the server explorer, click on the new DB -> right click -> properties
 9. Copy connection string from here
 10. Enter the connection string in appsettings.json like this        
-```
+```C#
     "ConnectionStrings": {
     "DefaultConnection": "Data Source=DESKTOP-D4KDER9\\SQLEXPRESS;Initial Catalog=pokemonreview;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False"
   },
@@ -191,7 +191,7 @@ The data context allows us to get and manipulate data from the database.
 - Create a new file inside it -> DataContext.cs
 
 1. The class inherits from DbContext (EF core)
-```
+```C#
 using Microsoft.EntityFrameworkCore;
 namespace PokemonReviewApp.Data
 {
@@ -201,7 +201,7 @@ namespace PokemonReviewApp.Data
 }
 ```
 2. Create datacontext constructor
-```
+```C#
 using Microsoft.EntityFrameworkCore;
 namespace PokemonReviewApp.Data
 {
@@ -212,7 +212,7 @@ namespace PokemonReviewApp.Data
 }
 ```
 3. Add tables from database
-```
+```C#
 using Microsoft.EntityFrameworkCore;
 using PokemonReviewApp.Models;
 
@@ -237,7 +237,7 @@ namespace PokemonReviewApp.Data
 
 ```
 4. Let EF know the relations we want to create
-```
+```C#
 using Microsoft.EntityFrameworkCore;
 using PokemonReviewApp.Models;
 
@@ -300,7 +300,7 @@ namespace PokemonReviewApp.Data
 ```
 ### 5. Setup program.cs file
 Add this to the program.cs file
-```
+```C#
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -308,7 +308,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 ```
 ### 6. Seeding
 1. This step involves adding some initial data to the database so that everything works fine. Create a new seed.cs file in the root folder and copy paste the following code
-```
+```C#
 using PokemonReviewApp.Data;
 using PokemonReviewApp.Models;
 
@@ -427,11 +427,11 @@ namespace PokemonReviewApp
 }
 ```
 2. Add this code to the program.cs file below builder.Services.AddControllers();
-```
+```C#
 builder.Services.AddTransient<Seed>();
 ```
 3. Add this code to the program.cs file below var app = builder.Build();
-```
+```C#
 if (args.Length == 1 && args[0].ToLower() == "seeddata")
     SeedData(app);
 
@@ -472,7 +472,7 @@ Interfaces define contracts that classes must adhere to. They declare a set of m
 - Add a new interface item **IPokemonRepository.cs**
 
 Our repository will inherit this interface. 
-```
+```C#
 using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Interfaces
@@ -489,7 +489,7 @@ Repositories are a pattern used to abstract and encapsulate data access logic. T
 
 - Create a new folder Repository
 - Add a new class item **PokemonRepository.cs**
-```
+```C#
 using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
@@ -528,7 +528,7 @@ using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]")]    // This boils down to api/Pokemon
     [ApiController]
     public class PokemonController : Controller
     {
