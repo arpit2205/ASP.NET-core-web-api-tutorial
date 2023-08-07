@@ -516,3 +516,43 @@ namespace PokemonReviewApp.Repository
 }
 
 ```
+### 3. Controllers
+Controllers handle incoming HTTP requests and serve as the entry points for your API's functionality. They use services, which in turn use repositories, to retrieve or manipulate data.
+
+- Create a new folder Controllers
+- Add a new item PokemonController.cs
+```brainfuck
+using Microsoft.AspNetCore.Mvc;
+using PokemonReviewApp.Interfaces;
+using PokemonReviewApp.Models;
+
+namespace PokemonReviewApp.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PokemonController : Controller
+    {
+        private readonly IPokemonRepository _pokemonRepository;
+
+        public PokemonController(IPokemonRepository pokemonRepository)
+        {
+            _pokemonRepository = pokemonRepository;
+        }
+
+        [HttpGet]
+        [ProducesResponseType(200, Type=typeof(IEnumerable<Pokemon>))]
+        public IActionResult GetPokemons()
+        {
+            var pokemons = _pokemonRepository.GetPokemons();
+
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return Ok(pokemons);
+        }
+    }
+}
+
+```
