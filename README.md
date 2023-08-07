@@ -461,3 +461,58 @@ Update-Database
 ```
 dotnet run seeddata
 ```
+
+## API
+To create API endpoints, we need to follow the repository pattern and thus we create interfaces, repositories and controllers.
+
+### 1. Interfaces
+Interfaces define contracts that classes must adhere to. They declare a set of methods and properties that implementing classes must provide.     
+
+- Create a new folder Interfaces
+- Add a new interface item **IPokemonRepository.cs**
+
+Our repository will inherit this interface. 
+```
+using PokemonReviewApp.Models;
+
+namespace PokemonReviewApp.Interfaces
+{
+    public interface IPokemonRepository
+    {
+        ICollection<Pokemon> GetPokemons();
+    }
+}
+
+```
+### 2. Repository
+Repositories are a pattern used to abstract and encapsulate data access logic. They provide an interface for interacting with data storage, such as databases or external APIs. They contain the API calls which are then utilized inside the controllers.
+
+- Create a new folder Repository
+- Add a new class item **PokemonRepository.cs**
+```
+using PokemonReviewApp.Data;
+using PokemonReviewApp.Interfaces;
+using PokemonReviewApp.Models;
+
+namespace PokemonReviewApp.Repository
+{
+    // inheriting the interface
+    public class PokemonRepository : IPokemonRepository
+    {
+        private readonly DataContext _context;
+
+        // bringing in the data context 
+        public PokemonRepository(DataContext context)
+        {
+            _context = context;
+        }
+
+        public ICollection<Pokemon> GetPokemons()
+        {
+            // DB API call
+            return _context.Pokemon.OrderBy(p => p.Id).ToList();
+        }
+    }
+}
+
+```
