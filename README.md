@@ -561,3 +561,53 @@ Then, inject the interface and repository to the program.cs file.
 builder.Services.AddScoped<IPokemonRepository, PokemonRepository>();
 ```
 The GET api/Pokemon endpoint is now ready! 🥳
+
+## ➡️ Add more API endpoints
+### 1. GET
+1. For Pokemon GET routes, first add required methods to the pokemon interface.
+```C#
+        Pokemon GetPokemon(int id);
+
+        Pokemon GetPokemon(string name);
+
+        bool PokemonExists(int id);
+```
+2. Then, add methods in the pokemon repository to get data from DB.
+```C#
+        public Pokemon GetPokemon(int id)
+        {
+            return _context.Pokemon.Where(p => p.Id == id).FirstOrDefault();
+        }
+
+        public Pokemon GetPokemon(string name)
+        {
+            return _context.Pokemon.Where(p => p.Name == name).FirstOrDefault();
+        }
+
+        public bool PokemonExists(int id)
+        {
+            return _context.Pokemon.Any(p => p.Id == id);
+        }
+```
+3. Then add methods in the pokemon controller (just added one in the example here)
+```C#
+        [HttpGet("{id}")]
+        [ProducesResponseType(200, Type=typeof(Pokemon))]
+        [ProducesResponseType(400)]
+        public IActionResult GetPokemon(int id)
+        {
+            if(!_pokemonRepository.PokemonExists(id))
+            {
+                return NotFound();
+            }
+
+            var pokemon = _pokemonRepository.GetPokemon(id);
+
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return Ok(pokemon);
+        }
+```
