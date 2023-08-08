@@ -611,3 +611,46 @@ The GET api/Pokemon endpoint is now ready! 🥳
             return Ok(pokemon);
         }
 ```
+> [!NOTE]
+> Right now, we are receiving all the existing fields in the Pokemon table through the API. However, we can limit the fields that we are receiving by creating a DTO (Data Transfer Object)
+
+### Setting up a DTO
+1. Create a new folder Dto
+2. Add a new file PokemonDto.cs (Similarly, multiple files for separate schemas)
+3. In this, we add only those fields which we intend to receive through the API.
+```C#
+namespace PokemonReviewApp.Dto
+{
+    public class PokemonDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public DateTime BirthDate { get; set; }
+    }
+}
+
+```
+4. Install AutoMapper and AutoMapperDependencyInjection NuGet packages.
+5. Add this to the program.cs file
+```C#
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+```
+6. Now, in the controller (pokemon controller), bring in the autoMapper instance in the controller
+```C#
+        private readonly IPokemonRepository _pokemonRepository;
+        private readonly IMapper _mapper; //new
+
+        public PokemonController(IPokemonRepository pokemonRepository, IMapper mapper) //new
+        {
+            _pokemonRepository = pokemonRepository;
+            _mapper = mapper; //new
+        }
+```
+7. Now, replace the API call data type with this:
+```C#
+// GetPokemons API
+var pokemons = _mapper.Map<List<PokemonDto>>(_pokemonRepository.GetPokemons());
+
+// GetPokemon(id) API
+var pokemon = _mapper.Map<PokemonDto>(_pokemonRepository.GetPokemon(id));
+```
