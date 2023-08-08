@@ -631,11 +631,29 @@ namespace PokemonReviewApp.Dto
 
 ```
 4. Install AutoMapper and AutoMapperDependencyInjection NuGet packages.
-5. Add this to the program.cs file
+5. Create a new folder Helper and add a new file `MappingProfiles.cs`. Here we create map models for their DTOs.
+```C#
+using AutoMapper;
+using PokemonReviewApp.Dto;
+using PokemonReviewApp.Models;
+
+namespace PokemonReviewApp.Helper
+{
+    public class MappingProfiles : Profile
+    {
+        public MappingProfiles()
+        {
+            CreateMap<Pokemon, PokemonDto>();
+        }
+    }
+}
+
+```
+7. Add this to the program.cs file
 ```C#
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 ```
-6. Now, in the controller (pokemon controller), bring in the autoMapper instance in the controller
+7. Now, in the controller (pokemon controller), bring in the autoMapper instance in the controller
 ```C#
         private readonly IPokemonRepository _pokemonRepository;
         private readonly IMapper _mapper; //new
@@ -646,7 +664,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             _mapper = mapper; //new
         }
 ```
-7. Now, replace the API call data type with this:
+8. Now, replace the API call data type with this:
 ```C#
 // GetPokemons API
 var pokemons = _mapper.Map<List<PokemonDto>>(_pokemonRepository.GetPokemons());
