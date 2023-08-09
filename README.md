@@ -563,7 +563,7 @@ builder.Services.AddScoped<IPokemonRepository, PokemonRepository>();
 The GET api/Pokemon endpoint is now ready! 🥳
 
 ## ➡️ Add more API endpoints
-### 1. GET
+### 1. GET Requests
 1. For Pokemon GET routes, first add required methods to the pokemon interface.
 ```C#
         Pokemon GetPokemon(int id);
@@ -671,4 +671,65 @@ var pokemons = _mapper.Map<List<PokemonDto>>(_pokemonRepository.GetPokemons());
 
 // GetPokemon(id) API
 var pokemon = _mapper.Map<PokemonDto>(_pokemonRepository.GetPokemon(id));
+```
+### 2. POST Requests
+Following is a POST request for creating a category and saving it into the database.
+1. Add a method in the interface. This method takes in the entire model as the parameter datatype. We also need to create a save() method that calls the saveChange() method which actually saves the changes in the database.
+```C#
+        bool CreateCategory(Category category);
+        bool Save();
+```
+2. Add that method in the repository
+```C#
+        public bool CreateCategory(Category category)
+        {
+            _context.Add(category);
+            return Save();
+        }
+
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
+        }
+```
+3. Add create method in the controller
+```C#
+        [HttpPost]
+        [ProducesResponseType(204)]
+        // [FromBody] allows to take JSON input from the body
+        public IActionResult CreateCategory([FromBody] CategoryDto category)
+        {
+            if(category == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var categoryAlreadyExists = _categoryRepository.GetCategories()
+                .Where(c => c.Name.Trim().ToUpper() == category.Name.TrimEnd().ToUpper())
+                .FirstOrDefault();
+
+            if(categoryAlreadyExists != null)
+            {
+                ModelState.AddModelError("", "Category already exists");
+                return StatusCode(422, ModelState);
+            }
+
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // reverse mapping -> In the MappingProfiles, add CreateMap<CategoryDto, Category>();
+            var categoryMap = _mapper.Map<Category>(category);
+
+            if(!_categoryRepository.CreateCategory(categoryMap))
+            {
+                ModelState.AddModelError("", "Error saving the category");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created");
+        }
+
 ```
