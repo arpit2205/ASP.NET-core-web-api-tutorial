@@ -45,7 +45,7 @@ _Refer to this image for relations_
 ![UMLDiagram](https://github.com/arpit2205/ASP.NET-core-web-api-tutorial/assets/51786177/7daa5312-7b6b-4a81-9564-811b5c3c9e93)
 
 
-1. **One to Many [One side]**
+1. **One to Many [One side]**     
 In the generated Owner SQL table, there will be an automatically generated CountryId column which will be a foreign key to the Country table.
 ```C#
 namespace PokemonReviewApp.Models
@@ -63,7 +63,7 @@ namespace PokemonReviewApp.Models
 }
 
 ```
-2. **One to Many [Many side]**
+2. **One to Many [Many side]**     
 In the generated Country SQL table, there will be no mention of Owners
 ```C#
 namespace PokemonReviewApp.Models
