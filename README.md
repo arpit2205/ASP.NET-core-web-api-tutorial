@@ -45,7 +45,8 @@ _Refer to this image for relations_
 ![UMLDiagram](https://github.com/arpit2205/ASP.NET-core-web-api-tutorial/assets/51786177/7daa5312-7b6b-4a81-9564-811b5c3c9e93)
 
 
-1. **One to Many [One side]**
+1. **One to Many [One side]**     
+In the generated Owner SQL table, there will be an automatically generated CountryId column which will be a foreign key to the Country table.
 ```C#
 namespace PokemonReviewApp.Models
 {
@@ -62,7 +63,8 @@ namespace PokemonReviewApp.Models
 }
 
 ```
-2. **One to Many [Many side]**
+2. **One to Many [Many side]**     
+In the generated Country SQL table, there will be no mention of Owners
 ```C#
 namespace PokemonReviewApp.Models
 {
@@ -561,3 +563,302 @@ Then, inject the interface and repository to the program.cs file.
 builder.Services.AddScoped<IPokemonRepository, PokemonRepository>();
 ```
 The GET api/Pokemon endpoint is now ready! 🥳
+
+## ➡️ Add more API endpoints
+### 1. GET Requests
+1. For Pokemon GET routes, first add required methods to the pokemon interface.
+```C#
+        Pokemon GetPokemon(int id);
+
+        Pokemon GetPokemon(string name);
+
+        bool PokemonExists(int id);
+```
+2. Then, add methods in the pokemon repository to get data from DB.
+```C#
+        public Pokemon GetPokemon(int id)
+        {
+            return _context.Pokemon.Where(p => p.Id == id).FirstOrDefault();
+        }
+
+        public Pokemon GetPokemon(string name)
+        {
+            return _context.Pokemon.Where(p => p.Name == name).FirstOrDefault();
+        }
+
+        public bool PokemonExists(int id)
+        {
+            return _context.Pokemon.Any(p => p.Id == id);
+        }
+```
+3. Then add methods in the pokemon controller (just added one in the example here)
+```C#
+        [HttpGet("{id}")]
+        [ProducesResponseType(200, Type=typeof(Pokemon))]
+        [ProducesResponseType(400)]
+        public IActionResult GetPokemon(int id)
+        {
+            if(!_pokemonRepository.PokemonExists(id))
+            {
+                return NotFound();
+            }
+
+            var pokemon = _pokemonRepository.GetPokemon(id);
+
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return Ok(pokemon);
+        }
+```
+
+⚠️ **For tables with one-to-many and many-to-many relationships, this is how you query the DB to get data**
+```C#
+// One-to-many
+        public Country GetCountryByOwner(int ownerId)
+        {
+            return _context.Owners.Where(o => o.Id == ownerId).Select(c => c.Country).FirstOrDefault();
+        }
+
+        public ICollection<Owner> GetOwnerByCountry(int countryId)
+        {
+            return _context.Owners.Where(c => c.Country.Id == countryId).ToList();
+        }
+
+// many-to-many joined tables
+        public ICollection<Owner> GetOwnerByPokemon(int pokeId)
+        {
+            return _context.PokemonOwners.Where(po => po.Pokemon.Id == pokeId).Select(o => o.Owner).ToList();
+        }
+
+        public ICollection<Pokemon> GetPokemonByOwner(int ownerId)
+        {
+            return _context.PokemonOwners.Where(po => po.Owner.Id == ownerId).Select(po => po.Pokemon).ToList();
+        }
+```
+
+> [!NOTE]
+> Right now, we are receiving all the existing fields in the Pokemon table through the API. However, we can limit the fields that we are receiving by creating a DTO (Data Transfer Object)
+
+### Setting up a DTO
+1. Create a new folder Dto
+2. Add a new file PokemonDto.cs (Similarly, multiple files for separate schemas)
+3. In this, we add only those fields which we intend to receive through the API.
+```C#
+namespace PokemonReviewApp.Dto
+{
+    public class PokemonDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public DateTime BirthDate { get; set; }
+    }
+}
+
+```
+4. Install AutoMapper and AutoMapperDependencyInjection NuGet packages.
+5. Create a new folder Helper and add a new file `MappingProfiles.cs`. Here we create map models for their DTOs.
+```C#
+using AutoMapper;
+using PokemonReviewApp.Dto;
+using PokemonReviewApp.Models;
+
+namespace PokemonReviewApp.Helper
+{
+    public class MappingProfiles : Profile
+    {
+        public MappingProfiles()
+        {
+            CreateMap<Pokemon, PokemonDto>();
+        }
+    }
+}
+
+```
+7. Add this to the program.cs file
+```C#
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+```
+7. Now, in the controller (pokemon controller), bring in the autoMapper instance in the controller
+```C#
+        private readonly IPokemonRepository _pokemonRepository;
+        private readonly IMapper _mapper; //new
+
+        public PokemonController(IPokemonRepository pokemonRepository, IMapper mapper) //new
+        {
+            _pokemonRepository = pokemonRepository;
+            _mapper = mapper; //new
+        }
+```
+8. Now, replace the API call data type with this:
+```C#
+// GetPokemons API
+var pokemons = _mapper.Map<List<PokemonDto>>(_pokemonRepository.GetPokemons());
+
+// GetPokemon(id) API
+var pokemon = _mapper.Map<PokemonDto>(_pokemonRepository.GetPokemon(id));
+```
+### 2. POST Requests
+Following is a POST request for creating a category and saving it into the database.
+1. Add a method in the interface. This method takes in the entire model as the parameter datatype. We also need to create a save() method that calls the saveChange() method which actually saves the changes in the database.
+```C#
+        bool CreateCategory(Category category);
+        bool Save();
+```
+2. Add that method in the repository
+```C#
+        public bool CreateCategory(Category category)
+        {
+            _context.Add(category);
+            return Save();
+        }
+
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
+        }
+```
+3. Add create method in the controller
+```C#
+        [HttpPost]
+        [ProducesResponseType(204)]
+        // [FromBody] allows to take JSON input from the body
+        public IActionResult CreateCategory([FromBody] CategoryDto category)
+        {
+            if(category == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var categoryAlreadyExists = _categoryRepository.GetCategories()
+                .Where(c => c.Name.Trim().ToUpper() == category.Name.TrimEnd().ToUpper())
+                .FirstOrDefault();
+
+            if(categoryAlreadyExists != null)
+            {
+                ModelState.AddModelError("", "Category already exists");
+                return StatusCode(422, ModelState);
+            }
+
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // reverse mapping -> In the MappingProfiles, add CreateMap<CategoryDto, Category>();
+            var categoryMap = _mapper.Map<Category>(category);
+
+            if(!_categoryRepository.CreateCategory(categoryMap))
+            {
+                ModelState.AddModelError("", "Error saving the category");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created");
+        }
+
+```
+⚠️ **[POST Requests for one-to-many schemas] While creating POST requests, if the model on which we are trying to create a new object contains ONE side of the one-to-many relationship, like "Country country" in the Owner schema, so while creating the owner POST request, we also have to provide a countryId in the [FromQuery] so that we can fetch the GetCountry(countryId) API and pass in the country to the Owner object.**
+```C#
+        [HttpPost]
+        [ProducesResponseType(204)]
+        public IActionResult CreateOwner(👉 [FromQuery] int countryId, [FromBody] OwnerDto owner)
+        {
+            if(owner == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if(!ModelState.IsValid) { 
+                return BadRequest(ModelState);
+            }
+
+            var ownerMap = _mapper.Map<Owner>(owner);
+            👉 ownerMap.Country = _countryRepository.GetCountry(countryId);
+
+            if(!_ownerRepository.CreateOwner(ownerMap))
+            {
+                ModelState.AddModelError("", "Error saving model");
+                StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created");
+        }
+```
+⚠️ **[POST Requests for many-to-many schemas]**     
+Interface     
+```C#
+        bool CreatePokemon(int ownerId, int categoryId, Pokemon pokemon);
+```
+Repository     
+```C#
+        public bool CreatePokemon(int ownerId, int categoryId, Pokemon pokemon)
+        {
+            // Creating joined-table objects first
+            
+            var pokemonOwnerEntity = _context.Owners.Where(o => o.Id ==  ownerId).FirstOrDefault();
+            var pokemonCategoryEntity = _context.Categories.Where(c => c.Id ==  categoryId).FirstOrDefault();
+
+            var pokemonOwner = new PokemonOwner()
+            {
+                Owner = pokemonOwnerEntity,
+                Pokemon = pokemon
+            };
+
+            _context.Add(pokemonOwner);
+
+            var pokemonCategory = new PokemonCategory()
+            {
+                Category = pokemonCategoryEntity,
+                Pokemon = pokemon
+            };
+
+            _context.Add(pokemonCategory);
+
+            // Pokemon table
+            _context.Add(pokemon);
+
+            return Save();
+        }
+```
+Controller     
+```C#
+        [HttpPost]
+        [ProducesResponseType(204)]
+        public IActionResult CreatePokemon([FromQuery] int ownerId, [FromQuery] int categoryId, [FromBody] PokemonDto pokemon)
+        {
+            if(pokemon == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var pokemonAlreadyExists = _pokemonRepository.GetPokemons()
+                .Where(p => p.Name.Trim().ToUpper() == pokemon.Name.TrimEnd().ToUpper())
+                .FirstOrDefault();
+
+            if(pokemonAlreadyExists != null)
+            {
+                ModelState.AddModelError("", "Already exists");
+                return StatusCode(422, ModelState);
+            }
+
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var pokemonMap = _mapper.Map<Pokemon>(pokemon);
+
+            if(!_pokemonRepository.CreatePokemon(ownerId, categoryId, pokemonMap))
+            {
+                ModelState.AddModelError("", "Error saving");
+                return StatusCode(422, ModelState);
+            }
+
+            return Ok("Successfully created");
+
+        }
+```
