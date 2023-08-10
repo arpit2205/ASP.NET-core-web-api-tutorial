@@ -46,6 +46,7 @@ _Refer to this image for relations_
 
 
 1. **One to Many [One side]**
+In the generated Owner SQL table, there will be an automatically generated CountryId column which will be a foreign key to the Country table.
 ```C#
 namespace PokemonReviewApp.Models
 {
@@ -63,6 +64,7 @@ namespace PokemonReviewApp.Models
 
 ```
 2. **One to Many [Many side]**
+In the generated Country SQL table, there will be no mention of Owners
 ```C#
 namespace PokemonReviewApp.Models
 {
