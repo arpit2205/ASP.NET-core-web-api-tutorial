@@ -762,3 +762,29 @@ Following is a POST request for creating a category and saving it into the datab
 
 ```
 ⚠️ **While creating POST requests, if the model on which we are trying to create a new object contains ONE side of the one-to-many relationship, like "Country country" in the Owner schema, so while creating the owner POST request, we also have to provide a countryId in the [FromQuery] so that we can fetch the GetCountry(countryId) API and pass in the country to the Owner object.**
+```C#
+        [HttpPost]
+        [ProducesResponseType(204)]
+        public IActionResult CreateOwner([FromQuery] int countryId, [FromBody] OwnerDto owner)
+        {
+            if(owner == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if(!ModelState.IsValid) { 
+                return BadRequest(ModelState);
+            }
+
+            var ownerMap = _mapper.Map<Owner>(owner);
+            ownerMap.Country = _countryRepository.GetCountry(countryId);
+
+            if(!_ownerRepository.CreateOwner(ownerMap))
+            {
+                ModelState.AddModelError("", "Error saving model");
+                StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created");
+        }
+```
