@@ -613,6 +613,32 @@ The GET api/Pokemon endpoint is now ready! 🥳
             return Ok(pokemon);
         }
 ```
+
+⚠️ **For tables with one-to-many and many-to-many relationships, this is how you query the DB to get data**
+```C#
+// One-to-many
+        public Country GetCountryByOwner(int ownerId)
+        {
+            return _context.Owners.Where(o => o.Id == ownerId).Select(c => c.Country).FirstOrDefault();
+        }
+
+        public ICollection<Owner> GetOwnerByCountry(int countryId)
+        {
+            return _context.Owners.Where(c => c.Country.Id == countryId).ToList();
+        }
+
+// many-to-many joined tables
+        public ICollection<Owner> GetOwnerByPokemon(int pokeId)
+        {
+            return _context.PokemonOwners.Where(po => po.Pokemon.Id == pokeId).Select(o => o.Owner).ToList();
+        }
+
+        public ICollection<Pokemon> GetPokemonByOwner(int ownerId)
+        {
+            return _context.PokemonOwners.Where(po => po.Owner.Id == ownerId).Select(po => po.Pokemon).ToList();
+        }
+```
+
 > [!NOTE]
 > Right now, we are receiving all the existing fields in the Pokemon table through the API. However, we can limit the fields that we are receiving by creating a DTO (Data Transfer Object)
 
@@ -735,3 +761,4 @@ Following is a POST request for creating a category and saving it into the datab
         }
 
 ```
+⚠️ **While creating POST requests, if the model on which we are trying to create a new object contains ONE side of the one-to-many relationship, like "Country country" in the Owner schema, so while creating the owner POST request, we also have to provide a countryId in the [FromQuery] so that we can fetch the GetCountry(countryId) API and pass in the country to the Owner object.**
